@@ -29,3 +29,12 @@
  *     import { myUtil } from '../utils'
  *
  */
+
+export class ObjectSet extends Set {
+  add(elem: unknown) {
+    return super.add(typeof elem === 'object' ? JSON.stringify(elem) : elem);
+  }
+  has(elem: unknown) {
+    return super.has(typeof elem === 'object' ? JSON.stringify(elem) : elem);
+  }
+}

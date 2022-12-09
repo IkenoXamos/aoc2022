@@ -1,4 +1,5 @@
 import run from "aocrunner";
+import { ObjectSet } from '../utils/index.js';
 
 const parseInput = (rawInput: string) => rawInput.split('\n').map(line => ({ direction: line.split(' ')[0], distance: Number(line.split(' ')[1]) }));
 
@@ -24,16 +25,11 @@ function vectorFromDisplacement(tailRelativeLocation: [number, number]): [number
 const part1 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
-  // 1000 x 1000 grid of booleans to track presence of the Tail
-  const grid: boolean[][] = [];
-  const GRID_SIZE = 1000;
-  for (let i = 0; i < GRID_SIZE; i++) {
-    grid.push(new Array(GRID_SIZE).fill(false));
-  }
+  const visitedPositions = new ObjectSet();
 
-  const headPosition: [number, number] = [Math.floor(grid.length / 2), Math.floor(grid.length / 2)];
-  const tailPosition: [number, number] = [...headPosition];
-  grid[tailPosition[0]][tailPosition[1]] = true; // The tail begins in the starting position
+  const headPosition: [number, number] = [0, 0];
+  const tailPosition: [number, number] = [0, 0];
+  visitedPositions.add([0, 0]);
 
   input.forEach(({ direction, distance }) => {
     const [head_dx, head_dy] = vectorFromDirection(direction);
@@ -46,35 +42,24 @@ const part1 = (rawInput: string) => {
       tailPosition[0] += tail_dx;
       tailPosition[1] += tail_dy;
 
-      grid[tailPosition[0]][tailPosition[1]] = true;
+      visitedPositions.add(tailPosition);
     }
   });
 
-  let total = 0;
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      total += (grid[i][j] ? 1 : 0);
-    }
-  }
-
-  return total;
+  return visitedPositions.size;
 };
 
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
-  const grid: boolean[][] = [];
-  const GRID_SIZE = 1000;
-  for (let i = 0; i < GRID_SIZE; i++) {
-    grid.push(new Array(GRID_SIZE).fill(false));
-  }
+  const visitedPositions = new ObjectSet();
 
-  const headPosition: [number, number] = [Math.floor(grid.length / 2), Math.floor(grid.length / 2)];
+  const headPosition: [number, number] = [0, 0];
   const tailPositions: [number, number][] = [];
   for (let i = 0; i < 9; i++) {
-    tailPositions.push([...headPosition]);
+    tailPositions.push([0, 0]);
   }
-  grid[tailPositions[8][0]][tailPositions[8][1]] = true; // The tail begins in the starting position
+  visitedPositions.add([0, 0]);
 
   input.forEach(({ direction, distance }) => {
     const [head_dx, head_dy] = vectorFromDirection(direction);
@@ -93,18 +78,11 @@ const part2 = (rawInput: string) => {
         tailPositions[j][1] += tail_dyj;
       }
 
-      grid[tailPositions[8][0]][tailPositions[8][1]] = true;
+      visitedPositions.add(tailPositions[8]);
     }
   });
 
-  let total = 0;
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      total += (grid[i][j] ? 1 : 0);
-    }
-  }
-
-  return total;
+  return visitedPositions.size;
 };
 
 run({
