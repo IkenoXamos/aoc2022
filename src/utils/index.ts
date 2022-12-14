@@ -38,3 +38,7 @@ export class ObjectSet extends Set {
     return super.has(typeof elem === 'object' ? JSON.stringify(elem) : elem);
   }
 }
+
+export const range = function* (end: number) {
+  for (let i = 0; i < end; i++) yield i;
+}
