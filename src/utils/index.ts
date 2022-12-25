@@ -42,3 +42,15 @@ export class ObjectSet extends Set {
 export const range = function* (end: number) {
   for (let i = 0; i < end; i++) yield i;
 }
+
+export const combinations = function* (end: number) {
+  for (const i of range(end)) {
+    for (const j of range(end)) yield [i, j] as [number, number];
+  }
+}
+
+export const combinations2 = function* (row: number, col: number) {
+  for (const i of range(row)) {
+    for (const j of range(col)) yield [i, j] as [number, number];
+  }
+}
