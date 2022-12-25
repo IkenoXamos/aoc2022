@@ -14,12 +14,14 @@
   "author": "IkenoXamos",
   "license": "ISC",
   "devDependencies": {
+    "@types/lcm": "^0.0.0",
     "@types/lodash": "^4.14.191",
     "@types/node": "^16.11.6",
     "aocrunner": "^1.9.6",
     "prettier": "^2.8.0"
   },
   "dependencies": {
+    "lcm": "^0.0.3",
     "lodash": "^4.17.21",
     "stack-typescript": "^1.0.4",
     "ts-pattern": "^4.0.6"

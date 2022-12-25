@@ -1,6 +1,7 @@
 import run from "aocrunner";
 import { match, P } from "ts-pattern";
 import { range } from "../utils/index.js";
+import lcm from 'lcm';
 
 type LiteralArgument = { type: "literal", value: number };
 type DynamicArgument = { type: "dynamic" };
@@ -23,6 +24,7 @@ type Monkey = {
   items: number[];
   operation: Operation;
   toss: (worryLevel: number) => number;
+  divisibleBy: number;
   inspections: number;
   inspect: (worryLevel: number) => number;
 }
@@ -55,7 +57,7 @@ const parseInput = (rawInput: string): Monkey[] => rawInput.split("\n\n").map((g
     .with({ type: "+", arg: { value: P.select() } }, (literal) => ((value: number) => value + literal))
     .exhaustive();
 
-  return { items, operation, toss, inspections: 0, inspect };
+  return { items, operation, toss, inspections: 0, inspect, divisibleBy };
 });
 
 const part1 = (rawInput: string) => {
@@ -89,30 +91,32 @@ const part1 = (rawInput: string) => {
 const part2 = (rawInput: string) => {
   const monkeys = parseInput(rawInput);
 
-  // for (const round of range(10000)) {
-  //   for (const monkey of monkeys) {
-  //     while (monkey.items.length > 0) {
-  //       const item = monkey.items.shift();
+  const lcmDivisor = monkeys.reduce<number>((divisor, monkey) => lcm(divisor, monkey.divisibleBy), 1);
 
-  //       if (!item) {
-  //         break;
-  //       }
+  for (const round of range(10000)) {
+    for (const monkey of monkeys) {
+      while (monkey.items.length > 0) {
+        const item = monkey.items.shift();
 
-  //       const itemAfterInspection = monkey.inspect(item);
-  //       monkey.inspections++;
+        if (!item) {
+          break;
+        }
 
-  //       const destination = monkey.toss(itemAfterInspection);
+        const itemAfterInspection = monkey.inspect(item) % lcmDivisor;
 
-  //       monkeys[destination].items.push(itemAfterInspection);
-  //     }
-  //   }
-  // }
+        monkey.inspections++;
 
-  // return monkeys
-  //   .sort((a, b) => b.inspections - a.inspections) // sort based on number of inspections
-  //   .slice(0, 2) // grab the 2 most active
-  //   .reduce<number>((product, monkey) => product * monkey.inspections, 1); // multiply the values together
-  return;
+        const destination = monkey.toss(itemAfterInspection);
+
+        monkeys[destination].items.push(itemAfterInspection);
+      }
+    }
+  }
+
+  return monkeys
+    .sort((a, b) => b.inspections - a.inspections) // sort based on number of inspections
+    .slice(0, 2) // grab the 2 most active
+    .reduce<number>((product, monkey) => product * monkey.inspections, 1); // multiply the values together
 };
 
 run({
@@ -183,7 +187,7 @@ run({
           Test: divisible by 17
             If true: throw to monkey 0
             If false: throw to monkey 1`,
-        expected: 2713310158n,
+        expected: 2713310158,
       },
     ],
     solution: part2,
