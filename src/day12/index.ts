@@ -17,6 +17,7 @@ function positionIsValid(position: Position, maxRows: number, maxCols: number): 
 const parseInput = (rawInput: string) => {
   const grid = rawInput.split('\n').map((line) => line.split(''));
   let [startingPosition, endingPosition] = [[0, 0] as Position, [0, 0] as Position];
+  const potentialStartPositions: Position[] = [];
 
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
@@ -28,6 +29,10 @@ const parseInput = (rawInput: string) => {
       if (grid[i][j] === 'E') {
         endingPosition = [i, j];
         grid[i][j] = 'z';
+      }
+
+      if (grid[i][j] === 'a') {
+        potentialStartPositions.push([i, j]);
       }
     }
   }
@@ -56,7 +61,7 @@ const parseInput = (rawInput: string) => {
     }
   }
 
-  return {moves, startingPosition, endingPosition};
+  return {moves, startingPosition, endingPosition, potentialStartPositions};
 };
 
 function canMove(start: string, destination: string): boolean {
@@ -104,7 +109,31 @@ const part1 = (rawInput: string) => {
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
-  return;
+  const toVisit: Array<[Position, number]> = new Array(...input.potentialStartPositions.map(pos => [pos, 0] as [Position, number]));
+  const visited: ObjectSet<Position> = new ObjectSet();
+  
+  while (toVisit.length > 0) {
+    const tuple = toVisit.shift();
+
+    if (!tuple) throw new Error('Failed to grab element from queue');
+
+    const [position, steps] = tuple;
+    visited.add(position);
+
+    if (positionsMatch(position, input.endingPosition)) return steps;
+
+    const { validSteps } = input.moves[position[0]][position[1]];
+
+    for (const destination of validSteps) {
+      const destinationWillBeVisited = !!toVisit.find(([p, s]) => (positionsMatch(p, destination) && s === steps + 1));
+
+      if (!visited.has(destination) && !destinationWillBeVisited) {
+        toVisit.push([destination, steps + 1]);
+      }
+    }
+  }
+
+  return -1;
 };
 
 run({
@@ -124,10 +153,15 @@ run({
   },
   part2: {
     tests: [
-      // {
-      //   input: ``,
-      //   expected: "",
-      // },
+      {
+        input: `
+        Sabqponm
+        abcryxxl
+        accszExk
+        acctuvwj
+        abdefghi`,
+        expected: 29,
+      },
     ],
     solution: part2,
   },
