@@ -54,3 +54,14 @@ export const combinations2 = function* (row: number, col: number) {
     for (const j of range(col)) yield [i, j] as [number, number];
   }
 }
+
+export function* pairwise<T> (iterable: Iterable<T>) {
+  const iterator = iterable[Symbol.iterator]()
+  let current = iterator.next()
+  let next = iterator.next()
+  while (!next.done) {
+      yield [current.value, next.value] as [T, T]
+      current = next
+      next = iterator.next()
+  }
+}
