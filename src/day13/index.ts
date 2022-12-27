@@ -51,9 +51,14 @@ const part1 = (rawInput: string) => {
 };
 
 const part2 = (rawInput: string) => {
-  const input = parseInput(rawInput);
+  const input = parseInput(rawInput).flatMap((pair) => pair);
 
-  return;
+  const countOfPacketsLessThan2 = input.map((packet) => compare(packet, [[2]])).filter((order) => order === Order.Right).length;
+  const countOfPacketsLessThan6 = input.map((packet) => compare(packet, [[6]])).filter((order) => order === Order.Right).length;
+
+
+  return (countOfPacketsLessThan2 + 1) * (countOfPacketsLessThan6 + 2);
+
 };
 
 run({
@@ -97,10 +102,39 @@ run({
   },
   part2: {
     tests: [
-      // {
-      //   input: ``,
-      //   expected: "",
-      // },
+      {
+        input: `
+        [9]
+        [[8,7,6]]`,
+        expected: 2,
+      },
+      {
+        input: `
+        [1,1,3,1,1]
+        [1,1,5,1,1]
+
+        [[1],[2,3,4]]
+        [[1],4]
+
+        [9]
+        [[8,7,6]]
+
+        [[4,4],4,4]
+        [[4,4],4,4,4]
+
+        [7,7,7,7]
+        [7,7,7]
+
+        []
+        [3]
+
+        [[[]]]
+        [[]]
+
+        [1,[2,[3,[4,[5,6,7]]]],8,9]
+        [1,[2,[3,[4,[5,6,0]]]],8,9]`,
+        expected: 140,
+      },
     ],
     solution: part2,
   },
