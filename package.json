@@ -23,6 +23,7 @@
   "dependencies": {
     "lcm": "^0.0.3",
     "lodash": "^4.17.21",
+    "lodash.combinations": "^18.11.1",
     "stack-typescript": "^1.0.4",
     "ts-pattern": "^4.0.6"
   },

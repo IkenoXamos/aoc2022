@@ -34,8 +34,17 @@ export class ObjectSet<T> extends Set<T | string> {
   add(elem: T) {
     return super.add(typeof elem === 'object' ? JSON.stringify(elem) : elem);
   }
-  has(elem: T) {
+  has(elem: T | string) {
     return super.has(typeof elem === 'object' ? JSON.stringify(elem) : elem);
+  }
+  intersection(other: ObjectSet<T>): ObjectSet<T> {
+    return new ObjectSet([...this].filter(x => other.has(x)));
+  }
+  union(other: ObjectSet<T>): ObjectSet<T> {
+    return new ObjectSet([...this, ...other]);
+  }
+  difference(other: ObjectSet<T>): ObjectSet<T> {
+    return new ObjectSet([...this].filter(x => !other.has(x)));
   }
 }
 

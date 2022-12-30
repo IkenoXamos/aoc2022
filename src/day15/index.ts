@@ -1,5 +1,7 @@
 import run from "aocrunner";
 import { ObjectSet } from "../utils/index.js";
+import 'lodash.combinations';
+import _ from "lodash";
 
 type Position = [number, number];
 type Survey = { sensor: Position, beacon: Position };
@@ -40,10 +42,54 @@ const part1 = (rawInput: string) => {
   return blockedXCoordinates.size;
 };
 
+function getPerimeterAtDistance(position: Position, distance: number, predicate: (a: Position) => boolean = () => true): ObjectSet<Position> {
+  const perimeterPositions = new ObjectSet<Position>();
+
+  const [x, y] = position;
+
+  for (let i = 0; i < distance; i++) {
+    const positions = [
+      [x + distance - i, y - i],
+      [x - i, y - distance + i],
+      [x - distance + i, y + i],
+      [x + i, y + distance - i]
+    ] as Position[];
+
+    positions.forEach((position) => {
+      if (predicate(position)) perimeterPositions.add(position);
+    });
+  }
+
+  return perimeterPositions;
+}
+
+function tuningFrequency(position: Position): number {
+  const [x, y] = position;
+
+  return x * 4000000 + y;
+}
+
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
-  return;
+  const perimeters = input.map(({sensor, beacon}) => {
+    const manhattanDistanceBetweenSensorAndBeacon = manhattanDistance(sensor, beacon);
+    return getPerimeterAtDistance(sensor, manhattanDistanceBetweenSensorAndBeacon + 1, ([x, y]) => x >= 0 && x <= 4000000 && y >= 0 && y <= 4000000);
+  });
+
+  const intersections = _.combinations(perimeters, 2).map(([a, b]) => a.intersection(b));
+
+  // Quick check that we aren't getting too many possible candidate positions
+  // There should ultimately be exactly 1 possible position
+  // intersections.forEach((intersection) => {
+  //   if (intersection.size > 1) {
+  //     throw new Error('Too many candidate positions found');
+  //   }
+  // });
+
+  const result: Position = intersections.filter((intersection) => intersection.size > 0)[0].values().next().value;
+
+  return tuningFrequency(result);
 };
 
 run({
@@ -65,7 +111,7 @@ run({
         Sensor at x=16, y=7: closest beacon is at x=15, y=3
         Sensor at x=14, y=3: closest beacon is at x=15, y=3
         Sensor at x=20, y=1: closest beacon is at x=15, y=3`,
-        expected: 26,
+        expected: 0,
       },
     ],
     solution: part1,
